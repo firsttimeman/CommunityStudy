@@ -1,13 +1,20 @@
 package com.studyCommunity.Community.entity;
 
+import com.studyCommunity.Community.type.AttachmentStatus;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Attachment extends BaseEntity{
 
     @Id @GeneratedValue
@@ -17,7 +24,7 @@ public class Attachment extends BaseEntity{
     private String originalFileName;
 
     @Column(nullable = false)
-    private Integer fileSize;
+    private int fileSize;
 
     @Column(nullable = false)
     private String userId;
@@ -26,8 +33,16 @@ public class Attachment extends BaseEntity{
     private String s3Key;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "post_id")
+    @JoinColumn(name = "post_id")
     private Post post;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AttachmentStatus attachmentStatus;
+
+    public void attachedTo(Post post) {
+        this.post = post;
+        this.attachmentStatus = AttachmentStatus.ATTACHED;
+    }
 
 }

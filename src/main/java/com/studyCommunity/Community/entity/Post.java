@@ -1,13 +1,18 @@
 package com.studyCommunity.Community.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Getter
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Post extends BaseEntity {
 
     @Id @GeneratedValue
@@ -21,5 +26,6 @@ public class Post extends BaseEntity {
 
     @Column(nullable = false)
     private String userId;
+
 
 }
