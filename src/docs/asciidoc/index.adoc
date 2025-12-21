@@ -1,0 +1,6 @@
+= Community API
+:toc: left
+:toclevels: 2
+
+include::post.adoc[]
+include::comment.adoc[]
