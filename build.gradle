@@ -45,7 +45,8 @@ dependencies {
 
 	implementation platform("software.amazon.awssdk:bom:2.25.61")
 	implementation "software.amazon.awssdk:s3"
-	implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+	implementation 'io.github.cdimascio:java-dotenv:5.2.2'
+
 }
 
 tasks.named('test') {

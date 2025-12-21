@@ -4,19 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostRequest {
-
-    private String title;
+public class CommentResponse {
+    private Long commentId;
     private String content;
-    private List<Long> attachmentIds;
-
-
+    private String userId;
+    private LocalDateTime createdAt;
 }

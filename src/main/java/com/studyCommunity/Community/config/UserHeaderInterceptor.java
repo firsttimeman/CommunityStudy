@@ -1,8 +1,8 @@
 package com.studyCommunity.Community.config;
 
+import com.studyCommunity.Community.exception.BadRequestException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.coyote.BadRequestException;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 public class UserHeaderInterceptor implements HandlerInterceptor {
