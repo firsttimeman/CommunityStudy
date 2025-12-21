@@ -13,7 +13,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class AttachmentUploadService {
+public class AttachmentService {
 
     private final AttachmentRepository attachmentRepository;
     private final S3Uploader s3Uploader;
