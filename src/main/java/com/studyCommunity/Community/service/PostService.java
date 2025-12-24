@@ -43,11 +43,11 @@ public class PostService {
         }
 
 
-        List<Attachment> id = attachmentRepository.findAllById(request.getAttachmentIds());
-
-        for (Attachment attachment : id) {
-            attachment.attachedTo(post);
-        }
+        attachmentService.attachToPost(
+                request.getAttachmentIds(),
+                post,
+                userId
+        );
 
         return post.getPostId();
     }
