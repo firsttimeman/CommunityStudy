@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -54,6 +54,16 @@ public class S3UploaderImpl implements S3Uploader{
                 .build();
 
         s3Client.deleteObject(request);
+    }
+
+    @Override
+    public ResponseInputStream<GetObjectResponse> downloadStream(String s3Key) {
+        GetObjectRequest request = GetObjectRequest.builder()
+                .bucket(bucket)
+                .key(s3Key)
+                .build();
+
+        return s3Client.getObject(request);
     }
 
     private String generateKey(String originalFilename) {
