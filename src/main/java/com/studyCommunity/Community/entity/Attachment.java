@@ -40,7 +40,15 @@ public class Attachment extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private AttachmentStatus attachmentStatus;
 
-    public void attachedTo(Post post) {
+    public void attachTo(Post post) {
+        if (post == null) {
+            throw new IllegalArgumentException("게시글은 null일 수 없습니다.");
+        }
+
+        if (this.attachmentStatus != AttachmentStatus.TEMP) {
+            throw new IllegalStateException("이미 게시글에 첨부된 파일입니다.");
+        }
+
         this.post = post;
         this.attachmentStatus = AttachmentStatus.ATTACHED;
     }
