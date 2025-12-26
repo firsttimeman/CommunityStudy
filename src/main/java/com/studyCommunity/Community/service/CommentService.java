@@ -15,7 +15,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-
 public class CommentService {
 
     private final CommentRepository commentRepository;
@@ -28,7 +27,6 @@ public class CommentService {
 
         Comment comment = Comment.createComment(request.getContent(), userId, post);
         commentRepository.save(comment);
-
         return new CommentResponse(comment.getCommentId(),
                 comment.getContent(),
                 comment.getUserId(),
@@ -57,7 +55,7 @@ public class CommentService {
     }
 
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<CommentResponse> getComments(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("POST NOT FOUND"));
