@@ -115,4 +115,17 @@ public class PostService {
 
     }
 
+
+    @Transactional
+    public void addAttachments(Long postId, List<Long> attachmentIds, String userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("POST NOT FOUND"));
+
+        if (!userId.equals(post.getUserId())) {
+            throw new IllegalArgumentException("게시글 작성자만 첨부파일을 추가할 수 있습니다.");
+        }
+
+        attachmentService.attachToPost(attachmentIds, post, userId);
+    }
+
 }
