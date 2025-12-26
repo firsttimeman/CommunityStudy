@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "comments")
 public class Comment extends BaseEntity {
 
     @Id
@@ -24,7 +25,7 @@ public class Comment extends BaseEntity {
     private String userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id" , nullable = false)
+    @JoinColumn(name = "post_id")
     private Post post;
 
     public static Comment createComment(String content, String userId, Post post) {
