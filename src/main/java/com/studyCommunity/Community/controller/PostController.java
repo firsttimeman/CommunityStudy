@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/post")
 @RequiredArgsConstructor
@@ -68,6 +70,16 @@ public class PostController {
             @PathVariable Long postId
     ) {
         return postService.getPostDetail(postId);
+    }
+
+    @PostMapping("/{postId}/attachments")
+    public ResponseEntity<Void> addAttachments(
+            @RequestAttribute("userId") String userId,
+            @PathVariable Long postId,
+            @RequestBody List<Long> attachmentIds
+    ) {
+        postService.addAttachments(postId, attachmentIds, userId);
+        return ResponseEntity.noContent().build();
     }
 
 }
