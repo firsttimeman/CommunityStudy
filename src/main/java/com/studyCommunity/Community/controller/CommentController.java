@@ -16,15 +16,15 @@ import java.util.List;
 public class CommentController {
     private final CommentService commentService;
 
-    @PostMapping("/{postId}/comments")
-    public ResponseEntity<CommentResponse> createComment(@PathVariable Long postId,
-                                          @RequestBody CommentCreateRequest request,
-                                          @RequestAttribute("userId") String userId) {
+    @PostMapping("/posts/{postId}")
+    public ResponseEntity<CommentResponse> createComment( @RequestAttribute("userId") String userId,
+                                                          @PathVariable Long postId,
+                                          @RequestBody CommentCreateRequest request) {
         CommentResponse comment = commentService.createComment(postId, request, userId);
         return ResponseEntity.ok(comment);
     }
 
-    @PutMapping("/comments/{commentId}")
+    @PutMapping("/{commentId}")
     public ResponseEntity<Object> updateComment(@PathVariable Long commentId,
                                                 @RequestBody CommentUpdateRequest request,
                                                 @RequestAttribute("userId") String userId) {
@@ -32,16 +32,16 @@ public class CommentController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/comments/{commentId}")
+    @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> deleteComment(
             @PathVariable Long commentId,
-            @RequestHeader("X-User-Id") String userId
+            @RequestAttribute("userId") String userId
     ) {
         commentService.delete(commentId, userId);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{postId}/comments")
+    @GetMapping("/posts/{postId}")
     public ResponseEntity<List<CommentResponse>> getComments(
             @PathVariable Long postId
     ) {
