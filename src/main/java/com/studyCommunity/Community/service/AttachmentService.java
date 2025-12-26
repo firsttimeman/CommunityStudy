@@ -115,10 +115,7 @@ public class AttachmentService {
 
     @Transactional
     public void deleteAttachmentByIds(List<Long> attachmentIds, String userId) {
-
-        if (attachmentIds == null || attachmentIds.isEmpty()) {
-            return;
-        }
+        if (attachmentIds == null || attachmentIds.isEmpty()) return;
 
         List<Attachment> attachments = attachmentRepository.findAllById(attachmentIds);
 
@@ -126,38 +123,30 @@ public class AttachmentService {
             throw new IllegalArgumentException("존재하지 않는 첨부파일 ID가 포함되어 있습니다.");
         }
 
-        for (Attachment attachment : attachments) {
-
-            Post post = attachment.getPost();
+        for (Attachment a : attachments) {
+            Post post = a.getPost();
 
             if (post == null) {
-                throw new IllegalStateException(
-                        "게시글에 첨부되지 않은 파일(TEMP)은 삭제할 수 없습니다. attachmentId="
-                        + attachment.getAttachmentId()
-                );
-            }
-
-            if (!userId.equals(post.getUserId())) {
-                throw new IllegalArgumentException("게시글 작성자만 첨부파일을 삭제할 수 있습니다.");
+                if (!userId.equals(a.getUserId())) {
+                    throw new IllegalArgumentException("첨부파일 업로더만 삭제할 수 있습니다.");
+                }
+            } else {
+                if (!userId.equals(post.getUserId())) {
+                    throw new IllegalArgumentException("게시글 작성자만 첨부파일을 삭제할 수 있습니다.");
+                }
             }
         }
 
-        for (Attachment attachment : attachments) {
+        for (Attachment a : attachments) {
             try {
-                s3Uploader.delete(attachment.getS3Key());
+                s3Uploader.delete(a.getS3Key());
             } catch (Exception e) {
-                throw new AttachmentDeleteException(
-                        "S3 delete failed. key=" + attachment.getS3Key(), e
-                );
+                throw new AttachmentDeleteException("S3 delete failed. key=" + a.getS3Key(), e);
             }
         }
 
-        // 3. DB 삭제
         attachmentRepository.deleteAllInBatch(attachments);
-
-
     }
-
 
     @Transactional
     public AttachmentDownloadStreamResult download(Long attachmentId) {
