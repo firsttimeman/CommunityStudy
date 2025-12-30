@@ -3,8 +3,7 @@ package com.studyCommunity.Community.service;
 import com.studyCommunity.Community.dto.AttachmentDownloadStreamResult;
 import com.studyCommunity.Community.entity.Attachment;
 import com.studyCommunity.Community.entity.Post;
-import com.studyCommunity.Community.exception.AttachmentDeleteException;
-import com.studyCommunity.Community.exception.AttachmentUploadException;
+import com.studyCommunity.Community.exception.*;
 import com.studyCommunity.Community.infra.S3Uploader;
 import com.studyCommunity.Community.repository.AttachmentRepository;
 import com.studyCommunity.Community.type.AttachmentStatus;
@@ -77,16 +76,16 @@ public class AttachmentService {
         List<Attachment> attachments = attachmentRepository.findAllById(attachmentIds);
 
         if(attachments.size() != attachmentIds.size()) {
-            throw new IllegalArgumentException("존재하지 않는 첨부파일 ID가 포함되어 있습니다.");
+            throw new NotFoundException("존재하지 않는 첨부파일 ID가 포함되어 있습니다.");
         }
 
         for (Attachment attachment : attachments) {
             if(!userId.equals(attachment.getUserId())) {
-                throw new IllegalArgumentException("첨부파일 업로더가 아닙니다.");
+                throw new ForbiddenException("첨부파일 업로더가 아닙니다.");
             }
 
             if(attachment.getAttachmentStatus() != AttachmentStatus.TEMP) {
-                throw new IllegalStateException("이미 사용된 첨부파일입니다. attachmentId=" + attachment.getAttachmentId());
+                throw new ForbiddenException("이미 사용된 첨부파일입니다. attachmentId=" + attachment.getAttachmentId());
             }
 
             attachment.attachTo(post);
@@ -115,12 +114,14 @@ public class AttachmentService {
 
     @Transactional
     public void deleteAttachmentByIds(List<Long> attachmentIds, String userId) {
-        if (attachmentIds == null || attachmentIds.isEmpty()) return;
+        if (attachmentIds == null || attachmentIds.isEmpty()) {
+            throw new BadRequestException("첨부파일 ID 목록은 비어 있을 수 없습니다.");
+        }
 
         List<Attachment> attachments = attachmentRepository.findAllById(attachmentIds);
 
         if (attachments.size() != attachmentIds.size()) {
-            throw new IllegalArgumentException("존재하지 않는 첨부파일 ID가 포함되어 있습니다.");
+            throw new NotFoundException("존재하지 않는 첨부파일 ID가 포함되어 있습니다.");
         }
 
         for (Attachment a : attachments) {
@@ -128,11 +129,11 @@ public class AttachmentService {
 
             if (post == null) {
                 if (!userId.equals(a.getUserId())) {
-                    throw new IllegalArgumentException("첨부파일 업로더만 삭제할 수 있습니다.");
+                    throw new ForbiddenException("첨부파일 업로더만 삭제할 수 있습니다.");
                 }
             } else {
                 if (!userId.equals(post.getUserId())) {
-                    throw new IllegalArgumentException("게시글 작성자만 첨부파일을 삭제할 수 있습니다.");
+                    throw new ForbiddenException("게시글 작성자만 첨부파일을 삭제할 수 있습니다.");
                 }
             }
         }
@@ -151,10 +152,10 @@ public class AttachmentService {
     @Transactional
     public AttachmentDownloadStreamResult download(Long attachmentId) {
         Attachment attachment = attachmentRepository.findById(attachmentId)
-                .orElseThrow(() -> new IllegalArgumentException("첨부파일이 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException("첨부파일이 존재하지 않습니다."));
 
         if (attachment.getAttachmentStatus() != AttachmentStatus.ATTACHED) {
-            throw new IllegalStateException("게시글에 첨부되지 않은 파일입니다.");
+            throw new ForbiddenException("게시글에 첨부되지 않은 파일입니다.");
         }
 
 

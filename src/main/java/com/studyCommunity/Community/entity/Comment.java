@@ -1,5 +1,7 @@
 package com.studyCommunity.Community.entity;
 
+import com.studyCommunity.Community.exception.BadRequestException;
+import com.studyCommunity.Community.exception.ForbiddenException;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,7 +41,7 @@ public class Comment extends BaseEntity {
 
     public void updateComment(String content, String userId) {
         if(!this.userId.equals(userId)) {
-            throw new IllegalArgumentException("댓글 작성자만 수정할 수 있습니다.");
+            throw new ForbiddenException("댓글 작성자만 수정할 수 있습니다.");
         }
         this.content = content;
     }

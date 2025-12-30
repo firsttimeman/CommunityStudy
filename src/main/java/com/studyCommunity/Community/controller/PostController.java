@@ -1,7 +1,9 @@
 package com.studyCommunity.Community.controller;
 
 import com.studyCommunity.Community.dto.*;
+import com.studyCommunity.Community.exception.BadRequestException;
 import com.studyCommunity.Community.service.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +24,7 @@ public class PostController {
     public ResponseEntity<PostCreateResponse> createPost(
             @RequestAttribute("userId") String userId,
 //            @RequestHeader("X-User-Id") String userId,
-            @RequestBody PostRequest request
+            @Valid @RequestBody PostRequest request
     ) {
         Long postId = postService.createPost(request, userId);
         return ResponseEntity.ok(new PostCreateResponse(postId));
@@ -35,7 +37,7 @@ public class PostController {
     public void updatePost(
             @RequestAttribute("userId") String userId,
             @PathVariable Long postId,
-            @RequestBody PostUpdateRequest request
+            @Valid @RequestBody PostUpdateRequest request
     ) {
         postService.updatePost(request, userId, postId);
     }
@@ -59,6 +61,9 @@ public class PostController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
+        if(page < 0) throw new BadRequestException("page는 0 이상이어야 합니다.");
+        if(size <= 0 || size > 100) throw new BadRequestException("size는 1 ~ 100 사이어야 합니다.");
+
         return postService.getPostList(page, size);
     }
 

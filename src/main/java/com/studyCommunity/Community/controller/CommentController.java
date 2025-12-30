@@ -4,6 +4,7 @@ import com.studyCommunity.Community.dto.CommentCreateRequest;
 import com.studyCommunity.Community.dto.CommentResponse;
 import com.studyCommunity.Community.dto.CommentUpdateRequest;
 import com.studyCommunity.Community.service.CommentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class CommentController {
     @PostMapping("/posts/{postId}")
     public ResponseEntity<CommentResponse> createComment( @RequestAttribute("userId") String userId,
                                                           @PathVariable Long postId,
-                                          @RequestBody CommentCreateRequest request) {
+                                          @Valid @RequestBody CommentCreateRequest request) {
         CommentResponse comment = commentService.createComment(postId, request, userId);
         return ResponseEntity.ok(comment);
     }
@@ -27,7 +28,7 @@ public class CommentController {
     @PutMapping("/{commentId}")
     public ResponseEntity<Object> updateComment(@PathVariable Long commentId,
                                                 @RequestBody CommentUpdateRequest request,
-                                                @RequestAttribute("userId") String userId) {
+                                                @Valid @RequestAttribute("userId") String userId) {
         commentService.updateComment(commentId, request, userId);
         return ResponseEntity.noContent().build();
     }

@@ -2,6 +2,7 @@ package com.studyCommunity.Community.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -60,5 +61,22 @@ public class GlobalHandlerException {
                         e.getMessage(),
                         req.getRequestURI()
                 ));
+    }
+
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException e,
+            HttpServletRequest req
+    ) {
+        String message = e.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .findAny()
+                .map(err -> err.getField() + ": " + err.getDefaultMessage())
+                .orElse("validation failed");
+
+        return ResponseEntity.status(BAD_REQUEST)
+                .body(ErrorResponse.of(400, message, e.getMessage(), req.getRequestURI()));
     }
 }

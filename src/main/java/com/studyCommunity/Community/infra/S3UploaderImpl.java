@@ -1,5 +1,6 @@
 package com.studyCommunity.Community.infra;
 
+import com.studyCommunity.Community.exception.AttachmentUploadException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -41,8 +42,11 @@ public class S3UploaderImpl implements S3Uploader{
 
             return s3Key;
 
+
         } catch (IOException e) {
-            throw new RuntimeException("S3 upload failed", e);
+            throw new AttachmentUploadException("S3 업로드 중 IO 오류가 발생했습니다.", e);
+        } catch (S3Exception e) {
+            throw new AttachmentUploadException("S3 업로드 실패", e);
         }
     }
 

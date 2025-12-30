@@ -1,5 +1,6 @@
 package com.studyCommunity.Community.entity;
 
+import com.studyCommunity.Community.exception.BadRequestException;
 import com.studyCommunity.Community.type.AttachmentStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -42,11 +43,11 @@ public class Attachment extends BaseEntity{
 
     public void attachTo(Post post) {
         if (post == null) {
-            throw new IllegalArgumentException("게시글은 null일 수 없습니다.");
+            throw new BadRequestException("게시글은 null일 수 없습니다.");
         }
 
         if (this.attachmentStatus != AttachmentStatus.TEMP) {
-            throw new IllegalStateException("이미 게시글에 첨부된 파일입니다.");
+            throw new BadRequestException("이미 게시글에 첨부된 파일입니다.");
         }
 
         this.post = post;

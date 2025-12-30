@@ -3,6 +3,7 @@ package com.studyCommunity.Community.service;
 import com.studyCommunity.Community.dto.*;
 import com.studyCommunity.Community.entity.Attachment;
 import com.studyCommunity.Community.entity.Post;
+import com.studyCommunity.Community.exception.BadRequestException;
 import com.studyCommunity.Community.exception.ForbiddenException;
 import com.studyCommunity.Community.exception.NotFoundException;
 import com.studyCommunity.Community.repository.AttachmentRepository;
@@ -89,6 +90,7 @@ public class PostService {
 
 
 
+    @Transactional
     public PostDetailResponse getPostDetail(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("POST NOT FOUND"));
@@ -119,10 +121,15 @@ public class PostService {
     @Transactional
     public void addAttachments(Long postId, List<Long> attachmentIds, String userId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("POST NOT FOUND"));
+                .orElseThrow(() -> new NotFoundException("POST NOT FOUND"));
 
         if (!userId.equals(post.getUserId())) {
-            throw new IllegalArgumentException("게시글 작성자만 첨부파일을 추가할 수 있습니다.");
+            throw new ForbiddenException("게시글 작성자만 첨부파일을 추가할 수 있습니다.");
+        }
+
+
+        if (attachmentIds == null || attachmentIds.isEmpty()) {
+            throw new BadRequestException("첨부파일 ID 목록은 비어 있을 수 없습니다.");
         }
 
         attachmentService.attachToPost(attachmentIds, post, userId);

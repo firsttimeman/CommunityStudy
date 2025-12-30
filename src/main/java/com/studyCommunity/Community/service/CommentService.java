@@ -5,6 +5,8 @@ import com.studyCommunity.Community.dto.CommentResponse;
 import com.studyCommunity.Community.dto.CommentUpdateRequest;
 import com.studyCommunity.Community.entity.Comment;
 import com.studyCommunity.Community.entity.Post;
+import com.studyCommunity.Community.exception.ForbiddenException;
+import com.studyCommunity.Community.exception.NotFoundException;
 import com.studyCommunity.Community.repository.CommentRepository;
 import com.studyCommunity.Community.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +25,7 @@ public class CommentService {
     @Transactional
     public CommentResponse createComment(Long postId, CommentCreateRequest request, String userId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("POST NOT FOUND"));
+                .orElseThrow(() -> new NotFoundException("POST NOT FOUND"));
 
         Comment comment = Comment.createComment(request.getContent(), userId, post);
         commentRepository.save(comment);
@@ -36,7 +38,7 @@ public class CommentService {
     @Transactional
     public void updateComment(Long commentId, CommentUpdateRequest request, String userId) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("COMMENT NOT FOUND"));
+                .orElseThrow(() -> new NotFoundException("COMMENT NOT FOUND"));
 
 
         comment.updateComment(request.getContent(), userId);
@@ -45,10 +47,10 @@ public class CommentService {
     @Transactional
     public void delete(Long commentId, String userId) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("COMMENT NOT FOUND"));
+                .orElseThrow(() -> new NotFoundException("COMMENT NOT FOUND"));
 
         if (!comment.getUserId().equals(userId)) {
-            throw new IllegalArgumentException("댓글 작성자만 삭제할 수 있습니다.");
+            throw new ForbiddenException("댓글 작성자만 삭제할 수 있습니다.");
         }
 
         commentRepository.delete(comment);
@@ -58,7 +60,7 @@ public class CommentService {
     @Transactional
     public List<CommentResponse> getComments(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("POST NOT FOUND"));
+                .orElseThrow(() -> new NotFoundException("POST NOT FOUND"));
 
         return commentRepository.findAllByPostOrderByCreateTimeAsc(post)
                 .stream()
