@@ -40,7 +40,7 @@ public class Comment extends BaseEntity {
     }
 
     public void updateComment(String content, String userId) {
-        if(!this.userId.equals(userId)) {
+        if (!this.userId.equals(userId)) {
             throw new ForbiddenException("댓글 작성자만 수정할 수 있습니다.");
         }
         this.content = content;

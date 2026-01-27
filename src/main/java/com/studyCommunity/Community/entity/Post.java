@@ -15,7 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 public class Post extends BaseEntity {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Long postId;
 
     @Column(nullable = false)
