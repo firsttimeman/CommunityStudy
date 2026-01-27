@@ -18,9 +18,9 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/posts/{postId}")
-    public ResponseEntity<CommentResponse> createComment( @RequestAttribute("userId") String userId,
-                                                          @PathVariable Long postId,
-                                          @Valid @RequestBody CommentCreateRequest request) {
+    public ResponseEntity<CommentResponse> createComment(@RequestAttribute("userId") String userId,
+                                                         @PathVariable Long postId,
+                                                         @Valid @RequestBody CommentCreateRequest request) {
         CommentResponse comment = commentService.createComment(postId, request, userId);
         return ResponseEntity.ok(comment);
     }

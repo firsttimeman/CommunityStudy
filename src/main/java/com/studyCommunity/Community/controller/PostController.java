@@ -23,7 +23,6 @@ public class PostController {
     @PostMapping
     public ResponseEntity<PostCreateResponse> createPost(
             @RequestAttribute("userId") String userId,
-//            @RequestHeader("X-User-Id") String userId,
             @Valid @RequestBody PostRequest request
     ) {
         Long postId = postService.createPost(request, userId);
@@ -61,8 +60,8 @@ public class PostController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        if(page < 0) throw new BadRequestException("page는 0 이상이어야 합니다.");
-        if(size <= 0 || size > 100) throw new BadRequestException("size는 1 ~ 100 사이어야 합니다.");
+        if (page < 0) throw new BadRequestException("page는 0 이상이어야 합니다.");
+        if (size <= 0 || size > 100) throw new BadRequestException("size는 1 ~ 100 사이어야 합니다.");
 
         return postService.getPostList(page, size);
     }
