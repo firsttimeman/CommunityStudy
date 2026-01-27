@@ -16,8 +16,7 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class S3UploaderImpl implements S3Uploader{
-
+public class S3UploaderImpl implements S3Uploader {
     private final S3Client s3Client;
 
     @Value("${cloud.aws.s3.bucket}")
@@ -25,7 +24,6 @@ public class S3UploaderImpl implements S3Uploader{
 
     @Override
     public String upload(MultipartFile file) {
-
         String s3Key = generateKey(file.getOriginalFilename());
 
         try {
@@ -41,8 +39,6 @@ public class S3UploaderImpl implements S3Uploader{
             ));
 
             return s3Key;
-
-
         } catch (IOException e) {
             throw new AttachmentUploadException("S3 업로드 중 IO 오류가 발생했습니다.", e);
         } catch (S3Exception e) {
@@ -71,10 +67,9 @@ public class S3UploaderImpl implements S3Uploader{
     }
 
     private String generateKey(String originalFilename) {
-
         String ext = "";
 
-        if(originalFilename != null && originalFilename.contains(".")) {
+        if (originalFilename != null && originalFilename.contains(".")) {
             ext = originalFilename.substring(originalFilename.lastIndexOf("."));
         }
 
