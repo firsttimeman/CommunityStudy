@@ -1,7 +1,7 @@
 package com.studyCommunity.Community.exception;
 
-public class NotFoundException extends RuntimeException {
+public class NotFoundException extends CustomException {
     public NotFoundException(String message) {
-        super(message);
+        super(404, "NOT_FOUND", message);
     }
 }
