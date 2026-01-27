@@ -154,7 +154,7 @@ public class AttachmentService {
             try {
                 s3Uploader.delete(a.getS3Key());
             } catch (Exception e) {
-                throw new AttachmentDeleteException("S3 delete failed. key=" + a.getS3Key(), e);
+                throw new AttachmentDeleteException("S3 delete failed. key="  + a.getS3Key(), e);
             }
         }
 
