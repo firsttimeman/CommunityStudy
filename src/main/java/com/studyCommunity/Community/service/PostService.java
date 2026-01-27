@@ -39,7 +39,7 @@ public class PostService {
 
         postRepository.save(post);
 
-        if(request.getAttachmentIds() == null || request.getAttachmentIds().isEmpty()) {
+        if (request.getAttachmentIds() == null || request.getAttachmentIds().isEmpty()) {
             return post.getPostId();
         }
 
@@ -72,7 +72,7 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("POST NOT FOUND"));
 
-        if(!post.getUserId().equals(userId)) {
+        if (!post.getUserId().equals(userId)) {
             throw new ForbiddenException("FORBIDDEN");
         }
 
@@ -87,7 +87,6 @@ public class PostService {
         Pageable pageable = PageRequest.of(page, size);
         return postRepository.findPostList(pageable);
     }
-
 
 
     @Transactional
@@ -119,6 +118,7 @@ public class PostService {
 
 
     @Transactional
+    // 이미 존재하는 게시글에 파일을 추가하는 경우
     public void addAttachments(Long postId, List<Long> attachmentIds, String userId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("POST NOT FOUND"));
