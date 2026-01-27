@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,9 +17,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Attachment extends BaseEntity{
+public class Attachment extends BaseEntity {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Long attachmentId;
 
     @Column(nullable = false)
@@ -41,6 +43,9 @@ public class Attachment extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private AttachmentStatus attachmentStatus;
 
+    @Column(nullable = true)
+    private LocalDateTime expireAt;
+
     public void attachTo(Post post) {
         if (post == null) {
             throw new BadRequestException("게시글은 null일 수 없습니다.");
@@ -52,6 +57,7 @@ public class Attachment extends BaseEntity{
 
         this.post = post;
         this.attachmentStatus = AttachmentStatus.ATTACHED;
+        this.expireAt = null;
     }
 
 }
