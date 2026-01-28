@@ -47,6 +47,9 @@ dependencies {
 	implementation "software.amazon.awssdk:s3"
 	implementation 'io.github.cdimascio:java-dotenv:5.2.2'
 
+	implementation 'net.javacrumbs.shedlock:shedlock-spring:5.10.0'
+	implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:5.10.0'
+
 }
 
 tasks.named('test') {
