@@ -5,6 +5,7 @@ import com.studyCommunity.Community.service.AttachmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,12 +23,12 @@ public class AttachmentController {
     private final AttachmentService attachmentService;
 
     @PostMapping("/upload")
-    public ResponseEntity<List<Long>> upload(
+    public ResponseEntity<BaseResponse<List<Long>>> upload(
             @RequestAttribute("userId") String userId,
             @RequestPart("files") List<MultipartFile> files
     ) {
         List<Long> attachmentIds = attachmentService.upload(files, userId);
-        return ResponseEntity.ok(attachmentIds);
+        return ResponseEntity.ok(BaseResponse.of(attachmentIds, HttpStatus.OK));
     }
 
 
@@ -59,11 +60,12 @@ public class AttachmentController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteByIds(
+    public ResponseEntity<BaseResponse<Void>> deleteByIds(
             @RequestAttribute("userId") String userId,
             @RequestBody List<Long> attachmentIds
     ) {
         attachmentService.deleteAttachmentByIds(attachmentIds, userId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(BaseResponse.of(HttpStatus.NO_CONTENT));
     }
 }
