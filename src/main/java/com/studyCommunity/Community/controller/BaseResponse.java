@@ -1,7 +1,9 @@
 package com.studyCommunity.Community.controller;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+@Getter
 public class BaseResponse<T> {
     private final T result;
     private final String message;

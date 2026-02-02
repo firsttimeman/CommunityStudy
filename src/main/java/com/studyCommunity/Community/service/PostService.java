@@ -1,7 +1,6 @@
 package com.studyCommunity.Community.service;
 
 import com.studyCommunity.Community.dto.*;
-import com.studyCommunity.Community.entity.Attachment;
 import com.studyCommunity.Community.entity.Post;
 import com.studyCommunity.Community.exception.BadRequestException;
 import com.studyCommunity.Community.exception.ForbiddenException;
