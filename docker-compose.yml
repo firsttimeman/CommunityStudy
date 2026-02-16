@@ -1,0 +1,91 @@
+version: "3.8"
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: community
+      TZ: Asia/Seoul
+    volumes:
+      - mysql-data:/var/lib/mysql
+    command:
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -proot --silent" ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  mysqld-exporter:
+    image: prom/mysqld-exporter:latest
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "9104:9104"
+    environment:
+      MYSQLD_EXPORTER_PASSWORD: root
+    command:
+      - --mysqld.address=mysql:3306
+      - --mysqld.username=root
+
+  spring:
+    build: .
+    image: spring-app
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+
+
+  # --------------------------
+  # Node Exporter (서버 CPU/Memory)
+  # --------------------------
+  node-exporter:
+    image: prom/node-exporter:latest
+    restart: always
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --path.rootfs=/rootfs
+
+volumes:
+  grafana-data:
+  mysql-data:
+  prometheus-data:

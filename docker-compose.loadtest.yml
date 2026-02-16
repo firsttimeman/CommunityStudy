@@ -1,0 +1,15 @@
+services:
+  k6:
+    image: grafana/k6:latest
+    container_name: k6_loadtest
+    volumes:
+      - ./k6:/scripts:ro
+    entrypoint: ["k6"]
+    networks:
+      - community_default
+    ports:
+      - "5665:5665"   # ✅ 추가
+
+networks:
+  community_default:
+    external: true
