@@ -1,15 +1,10 @@
 spring:
-  config:
-    import: optional:file:.env[.properties]
-
-
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-# open in view false 이유
   jpa:
     hibernate:
       ddl-auto: update
@@ -40,3 +35,15 @@ cloud:
     credentials:
       access-key: ${AWS_ACCESS_KEY}
       secret-key: ${AWS_SECRET_KEY}
+
+application:
+  name: community
+
+management:
+  metrics:
+    tags:
+      application: community
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
