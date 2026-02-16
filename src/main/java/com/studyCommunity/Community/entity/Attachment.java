@@ -20,7 +20,7 @@ import java.util.List;
 public class Attachment extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long attachmentId;
 
     @Column(nullable = false)

@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class Comment extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId;
 
     @Column(nullable = false)
