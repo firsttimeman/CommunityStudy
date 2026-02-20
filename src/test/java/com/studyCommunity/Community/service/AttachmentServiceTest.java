@@ -9,6 +9,7 @@ import com.studyCommunity.Community.exception.ForbiddenException;
 import com.studyCommunity.Community.exception.NotFoundException;
 import com.studyCommunity.Community.infra.S3Uploader;
 import com.studyCommunity.Community.repository.AttachmentRepository;
+import com.studyCommunity.Community.repository.PostRepository;
 import com.studyCommunity.Community.type.AttachmentStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +34,9 @@ class AttachmentServiceTest {
 
     @Mock
     private S3Uploader s3Uploader;
+
+    @Mock
+    private PostRepository postRepository;
 
     @InjectMocks
     private AttachmentService attachmentService;
@@ -136,50 +140,61 @@ class AttachmentServiceTest {
     @Test
     void 첨부삭제_ids비면_400() {
         assertThrows(BadRequestException.class,
-                () -> attachmentService.deleteAttachmentByIds(List.of(), "u1"));
+                () -> attachmentService.deleteAttachmentByIds(1L, List.of(), "u1"));
     }
 
     @Test
     void 첨부삭제_존재하지_않는_파일포함() {
+        Long postId = 1L;
         List<Long> ids = List.of(1L, 2L);
-        when(attachmentRepository.findAllById(ids)).thenReturn(List.of(mock(Attachment.class)));
+
+        Post post = mock(Post.class);
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(post.getUserId()).thenReturn("u1");
+
+        when(attachmentRepository.findAllByAttachmentIdInAndPost_PostId(ids, postId))
+                .thenReturn(List.of(mock(Attachment.class)));
 
         assertThrows(NotFoundException.class,
-                () -> attachmentService.deleteAttachmentByIds(ids, "u1"));
-
+                () -> attachmentService.deleteAttachmentByIds(postId, ids, "u1"));
     }
 
     @Test
     void 첨부삭제_post없는경우_실패() {
+        when(postRepository.findById(1L)).thenReturn(Optional.empty());
 
-        List<Long> ids = List.of(1L);
-
-        Attachment a = mock(Attachment.class);
-        when(a.getPost()).thenReturn(null);
-        when(a.getUserId()).thenReturn("u1");
-
-        when(attachmentRepository.findAllById(ids)).thenReturn(List.of(a));
-
-        assertThrows(ForbiddenException.class,
-                () -> attachmentService.deleteAttachmentByIds(ids, "other"));
+        assertThrows(NotFoundException.class,
+                () -> attachmentService.deleteAttachmentByIds(1L, List.of(1L), "u1"));
     }
+
+
+
     @Test
     void 첨부삭제_정상_S3삭제후_DB삭제() {
-        List<Long> ids = List.of(1L);
+        Long postId = 1L;
+        List<Long> ids = List.of(1L, 2L);
 
         Post post = mock(Post.class);
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
         when(post.getUserId()).thenReturn("writer");
 
-        Attachment a = mock(Attachment.class);
-        when(a.getPost()).thenReturn(post);
-        when(a.getS3Key()).thenReturn("k1");
+        Attachment a1 = mock(Attachment.class);
+        when(a1.getAttachmentStatus()).thenReturn(AttachmentStatus.ATTACHED);
+        when(a1.getS3Key()).thenReturn("k1");
 
-        when(attachmentRepository.findAllById(ids)).thenReturn(List.of(a));
+        Attachment a2 = mock(Attachment.class);
+        when(a2.getAttachmentStatus()).thenReturn(AttachmentStatus.ATTACHED);
+        when(a2.getS3Key()).thenReturn("k2");
 
-        attachmentService.deleteAttachmentByIds(ids, "writer");
+        when(attachmentRepository.findAllByAttachmentIdInAndPost_PostId(ids, postId))
+                .thenReturn(List.of(a1, a2));
+
+        attachmentService.deleteAttachmentByIds(postId, ids, "writer");
 
         verify(s3Uploader).delete("k1");
+        verify(s3Uploader).delete("k2");
         verify(attachmentRepository).deleteAllInBatch(anyList());
+        verify(post).decreaseAttachmentCount(2);
     }
 
     @Test
