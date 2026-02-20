@@ -59,12 +59,13 @@ public class AttachmentController {
         return "attachment; filename*=UTF-8''" + encoded;
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{postId}/attachments")
     public ResponseEntity<BaseResponse<Void>> deleteByIds(
             @RequestAttribute("userId") String userId,
+            @PathVariable Long postId,
             @RequestBody List<Long> attachmentIds
     ) {
-        attachmentService.deleteAttachmentByIds(attachmentIds, userId);
+        attachmentService.deleteAttachmentByIds(postId, attachmentIds, userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(BaseResponse.of(HttpStatus.NO_CONTENT));
     }
