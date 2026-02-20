@@ -29,6 +29,9 @@ public class CommentService {
 
         Comment comment = Comment.createComment(request.getContent(), userId, post);
         commentRepository.save(comment);
+
+        post.incrementCommentCount();
+
         return new CommentResponse(comment.getCommentId(),
                 comment.getContent(),
                 comment.getUserId(),
@@ -52,6 +55,9 @@ public class CommentService {
         if (!comment.getUserId().equals(userId)) {
             throw new ForbiddenException("댓글 작성자만 삭제할 수 있습니다.");
         }
+
+        Post post = comment.getPost();
+        post.decrementCommentCount();
 
         commentRepository.delete(comment);
     }
