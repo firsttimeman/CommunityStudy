@@ -1,9 +1,14 @@
+server:
+  port: 8080
+
 spring:
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
 
   jpa:
     hibernate:
@@ -48,5 +53,3 @@ management:
       exposure:
         include: health, info, metrics, prometheus
 
-  server:
-    port: 80
