@@ -68,13 +68,32 @@ public class PostController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        if (page < 0) throw new BadRequestException("page는 0 이상이어야 합니다.");
-        if (size <= 0 || size > 100) throw new BadRequestException("size는 1 ~ 100 사이어야 합니다.");
+        if (page < 0) page = 0;
+//        if (page < 0) throw new BadRequestException("page는 0 이상이어야 합니다.");
+        //if (size <= 0 || size > 100) throw new BadRequestException("size는 1 ~ 100 사이어야 합니다.");
+
+        if (size < 1) size = 1;
+        if (size > 100) size = 100;
 
         return ResponseEntity.ok(
                 BaseResponse.of(postService.getPostList(page, size), HttpStatus.OK)
         );
     }
+
+    @GetMapping("/popular")
+    public ResponseEntity<BaseResponse<Page<PostListResponse>>> getPopularFeed(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        if (page < 0) page = 0;
+        if (size < 1) size = 1;
+        if (size > 100) size = 100;
+
+        return ResponseEntity.ok(
+                BaseResponse.of(postService.getPopularFeed(page, size), HttpStatus.OK)
+        );
+    }
+
 
     /**
      * 게시글 상세 조회
