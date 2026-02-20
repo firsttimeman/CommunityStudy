@@ -30,4 +30,7 @@ public interface AttachmentRepository extends JpaRepository<Attachment, Long> {
             Pageable pageable
     );
 
+    List<Attachment> findAllByAttachmentIdInAndPost_PostId(List<Long> attachmentIds, Long postId);
+
+
 }
