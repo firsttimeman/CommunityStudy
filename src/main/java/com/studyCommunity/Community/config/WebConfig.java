@@ -18,8 +18,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/health",
                         "/alb-health",
-                        "/actuator/health",
-                        "/actuator/health/**",
+                        "/actuator/**",
                         "/error"
                 );
     }
