@@ -17,6 +17,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "attachment",
+        indexes = {
+            @Index(name = "idx_attachment_postid", columnList = "post_id"),
+                @Index(name = "idx_attachment_status_expireat", columnList = "attachment_status, expire_at")
+        }
+)
 public class Attachment extends BaseEntity {
 
     @Id
