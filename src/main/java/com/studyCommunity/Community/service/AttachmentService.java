@@ -7,6 +7,7 @@ import com.studyCommunity.Community.entity.Post;
 import com.studyCommunity.Community.exception.*;
 import com.studyCommunity.Community.infra.S3Uploader;
 import com.studyCommunity.Community.repository.AttachmentRepository;
+import com.studyCommunity.Community.repository.PostRepository;
 import com.studyCommunity.Community.type.AttachmentStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ public class AttachmentService {
 
     private final AttachmentRepository attachmentRepository;
     private final S3Uploader s3Uploader;
+    private final PostRepository postRepository;
 
     @Transactional
     public List<Long> upload(List<MultipartFile> files, String userId) {
@@ -104,6 +106,7 @@ public class AttachmentService {
 
             attachment.attachTo(post);
         }
+        post.increaseAttachmentCount(attachmentIds.size()); // todo 동시성 체크해보기
     }
 
 
@@ -125,28 +128,29 @@ public class AttachmentService {
     }
 
     @Transactional
-    public void deleteAttachmentByIds(List<Long> attachmentIds, String userId) {
+    public void deleteAttachmentByIds(Long postId , List<Long> attachmentIds, String userId) {
         if (attachmentIds == null || attachmentIds.isEmpty()) {
             throw new BadRequestException("첨부파일 ID 목록은 비어 있을 수 없습니다.");
         }
 
-        List<Attachment> attachments = attachmentRepository.findAllById(attachmentIds);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("POST NOT FOUND"));
+
+
+        if (!userId.equals(post.getUserId())) {
+            throw new ForbiddenException("게시글 작성자만 첨부파일을 삭제할 수 있습니다.");
+        }
+
+        List<Attachment> attachments =
+                attachmentRepository.findAllByAttachmentIdInAndPost_PostId(attachmentIds, postId);
 
         if (attachments.size() != attachmentIds.size()) {
             throw new NotFoundException("존재하지 않는 첨부파일 ID가 포함되어 있습니다.");
         }
 
         for (Attachment a : attachments) {
-            Post post = a.getPost();
-
-            if (post == null) { //todo 이거 한번만 생각해보기 왜 필요하지?
-                if (!userId.equals(a.getUserId())) {
-                    throw new ForbiddenException("첨부파일 업로더만 삭제할 수 있습니다.");
-                }
-            } else {
-                if (!userId.equals(post.getUserId())) {
-                    throw new ForbiddenException("게시글 작성자만 첨부파일을 삭제할 수 있습니다.");
-                }
+            if (a.getAttachmentStatus() != AttachmentStatus.ATTACHED) {
+                throw new BadRequestException("게시글에 첨부된 파일만 삭제할 수 있습니다.");
             }
         }
 
@@ -159,6 +163,8 @@ public class AttachmentService {
         }
 
         attachmentRepository.deleteAllInBatch(attachments);
+        post.decreaseAttachmentCount(attachments.size());
+
     }
 
     @Transactional
