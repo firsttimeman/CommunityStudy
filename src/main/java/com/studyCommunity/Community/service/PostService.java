@@ -13,9 +13,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Service
 @RequiredArgsConstructor
@@ -83,8 +86,15 @@ public class PostService {
 
     @Transactional
     public Page<PostListResponse> getPostList(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(DESC, "createTime"));
         return postRepository.findPostList(pageable);
+    }
+
+
+    @Transactional
+    public Page<PostListResponse> getPopularFeed(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return postRepository.findPopularPostList(pageable);
     }
 
 
@@ -116,6 +126,8 @@ public class PostService {
     }
 
 
+
+
     @Transactional
     // 이미 존재하는 게시글에 파일을 추가하는 경우
     public void addAttachments(Long postId, List<Long> attachmentIds, String userId) {
@@ -132,6 +144,8 @@ public class PostService {
         }
 
         attachmentService.attachToPost(attachmentIds, post, userId);
+
+        post.increaseAttachmentCount(attachmentIds.size());
     }
 
 }
