@@ -27,6 +27,7 @@ services:
     ports:
       - "3307:3306"
     environment:
+#      DB_URL: jdbc:mysql://mysql:3307/community?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: community
       TZ: Asia/Seoul

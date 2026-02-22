@@ -145,7 +145,7 @@ public class PostService {
 
         attachmentService.attachToPost(attachmentIds, post, userId);
 
-        post.increaseAttachmentCount(attachmentIds.size());
+//        post.increaseAttachmentCount(attachmentIds.size());
     }
 
 }

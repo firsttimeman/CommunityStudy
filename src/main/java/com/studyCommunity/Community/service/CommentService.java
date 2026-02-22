@@ -30,7 +30,7 @@ public class CommentService {
         Comment comment = Comment.createComment(request.getContent(), userId, post);
         commentRepository.save(comment);
 
-        post.incrementCommentCount();
+//        post.incrementCommentCount();
 
         return new CommentResponse(comment.getCommentId(),
                 comment.getContent(),
@@ -57,7 +57,7 @@ public class CommentService {
         }
 
         Post post = comment.getPost();
-        post.decrementCommentCount();
+//        post.decrementCommentCount();
 
         commentRepository.delete(comment);
     }
