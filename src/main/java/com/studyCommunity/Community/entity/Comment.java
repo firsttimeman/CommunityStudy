@@ -1,6 +1,5 @@
 package com.studyCommunity.Community.entity;
 
-import com.studyCommunity.Community.exception.BadRequestException;
 import com.studyCommunity.Community.exception.ForbiddenException;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
