@@ -106,7 +106,7 @@ public class AttachmentService {
 
             attachment.attachTo(post);
         }
-        post.increaseAttachmentCount(attachmentIds.size()); // todo 동시성 체크해보기
+        postRepository.increaseAttachmentCount(post.getPostId(), attachmentIds.size());
     }
 
 
@@ -163,7 +163,7 @@ public class AttachmentService {
         }
 
         attachmentRepository.deleteAllInBatch(attachments);
-        post.decreaseAttachmentCount(attachments.size());
+        postRepository.decreaseAttachmentCount(postId, attachments.size());
 
     }
 

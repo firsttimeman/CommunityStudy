@@ -92,8 +92,9 @@ public class PostService {
 
 
     @Transactional
-    public Page<PostListResponse> getPopularFeed(int page, int size) {
+    public Page<PostListResponse> getPopularFeed(int page, int size) throws InterruptedException {
         Pageable pageable = PageRequest.of(page, size);
+//        Thread.sleep(10);
         return postRepository.findPopularPostList(pageable);
     }
 
@@ -103,16 +104,23 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("POST NOT FOUND"));
 
+        PageRequest pageable = PageRequest.of(0, 50);
+
         List<AttachmentResponse> attachments = attachmentRepository.findAllByPost(post)
                 .stream()
                 .map(a -> new AttachmentResponse
                         (a.getAttachmentId(), a.getOriginalFileName(), a.getS3Key()))
                 .toList();
 
-        List<CommentResponse> comments = commentRepository.findAllByPostOrderByCreateTimeAsc(post)
+        List<CommentResponse> comments = commentRepository
+                .findByPost_PostIdOrderByCreateTimeAsc(postId, pageable)
                 .stream()
-                .map(a -> new CommentResponse
-                        (a.getCommentId(), a.getContent(), a.getUserId(), a.getCreateTime()))
+                .map(c -> new CommentResponse(
+                        c.getCommentId(),
+                        c.getContent(),
+                        c.getUserId(),
+                        c.getCreateTime()
+                ))
                 .toList();
 
         return new PostDetailResponse(post.getPostId(),
@@ -145,7 +153,10 @@ public class PostService {
 
         attachmentService.attachToPost(attachmentIds, post, userId);
 
-        post.increaseAttachmentCount(attachmentIds.size());
     }
+
+
+
+
 
 }
