@@ -47,10 +47,12 @@ public class CommentController {
 
     @GetMapping("/posts/{postId}")
     public ResponseEntity<BaseResponse<List<CommentResponse>>> getComments(
-            @PathVariable Long postId
+            @PathVariable Long postId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size
     ) {
         return ResponseEntity.ok(
-                BaseResponse.of(commentService.getComments(postId), HttpStatus.OK)
+                BaseResponse.of(commentService.getComments(postId, page, size), HttpStatus.OK)
         );
     }
 
