@@ -84,7 +84,7 @@ public class PostController {
     public ResponseEntity<BaseResponse<Page<PostListResponse>>> getPopularFeed(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
-    ) {
+    ) throws InterruptedException {
         if (page < 0) page = 0;
         if (size < 1) size = 1;
         if (size > 100) size = 100;
@@ -93,6 +93,9 @@ public class PostController {
                 BaseResponse.of(postService.getPopularFeed(page, size), HttpStatus.OK)
         );
     }
+
+
+
 
 
     /**
@@ -117,5 +120,8 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(BaseResponse.of(HttpStatus.NO_CONTENT));
     }
+
+
+
 
 }
