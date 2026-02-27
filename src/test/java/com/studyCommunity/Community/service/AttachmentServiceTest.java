@@ -194,7 +194,7 @@ class AttachmentServiceTest {
         verify(s3Uploader).delete("k1");
         verify(s3Uploader).delete("k2");
         verify(attachmentRepository).deleteAllInBatch(anyList());
-        verify(post).decreaseAttachmentCount(2);
+        verify(postRepository).decreaseAttachmentCount(1L,2);
     }
 
     @Test

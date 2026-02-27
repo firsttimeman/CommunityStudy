@@ -5,22 +5,22 @@ import com.studyCommunity.Community.dto.CommentResponse;
 import com.studyCommunity.Community.dto.CommentUpdateRequest;
 import com.studyCommunity.Community.entity.Comment;
 import com.studyCommunity.Community.entity.Post;
-import com.studyCommunity.Community.exception.BadRequestException;
 import com.studyCommunity.Community.exception.ForbiddenException;
 import com.studyCommunity.Community.exception.NotFoundException;
 import com.studyCommunity.Community.repository.CommentRepository;
 import com.studyCommunity.Community.repository.PostRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
@@ -196,9 +196,8 @@ class CommentServiceTest {
 
         Long postId = 1L;
 
-        Post post = mock(Post.class);
-        when(postRepository.findById(postId))
-                .thenReturn(Optional.of(post));
+        // ✅ 이거 추가
+        when(postRepository.existsById(postId)).thenReturn(true);
 
         Comment c1 = mock(Comment.class);
         Comment c2 = mock(Comment.class);
@@ -213,29 +212,30 @@ class CommentServiceTest {
         when(c2.getUserId()).thenReturn("u2");
         when(c2.getCreateTime()).thenReturn(null);
 
-        when(commentRepository.findAllByPostOrderByCreateTimeAsc(post))
+        when(commentRepository.findByPost_PostIdOrderByCreateTimeAsc(eq(postId), any(Pageable.class)))
                 .thenReturn(List.of(c1, c2));
 
-        List<CommentResponse> res = commentService.getComments(postId);
+        List<CommentResponse> res = commentService.getComments(postId, 0, 10);
 
         assertNotNull(res);
         assertEquals(2, res.size());
-
     }
 
     @Test
     void 코멘트_가지고오기_조회_실패() {
 
         Long postId = 1L;
-        when(postRepository.findById(postId))
-                .thenReturn(Optional.empty());
+
+        when(postRepository.existsById(postId)).thenReturn(false);
 
         assertThrows(
                 NotFoundException.class,
-                () -> commentService.getComments(postId)
+                () -> commentService.getComments(postId, 0, 10)
         );
 
-        verify(commentRepository, never()).findAllByPostOrderByCreateTimeAsc(any());
+        verify(commentRepository, never())
+                .findByPost_PostIdOrderByCreateTimeAsc(anyLong(), any(Pageable.class));
+
     }
 
 

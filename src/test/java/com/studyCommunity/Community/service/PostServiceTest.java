@@ -1,9 +1,6 @@
 package com.studyCommunity.Community.service;
 
-import com.studyCommunity.Community.dto.PostDetailResponse;
-import com.studyCommunity.Community.dto.PostListResponse;
-import com.studyCommunity.Community.dto.PostRequest;
-import com.studyCommunity.Community.dto.PostUpdateRequest;
+import com.studyCommunity.Community.dto.*;
 import com.studyCommunity.Community.entity.Attachment;
 import com.studyCommunity.Community.entity.Comment;
 import com.studyCommunity.Community.entity.Post;
@@ -40,6 +37,7 @@ class PostServiceTest {
     @Mock AttachmentRepository attachmentRepository;
     @Mock AttachmentService attachmentService;
     @Mock CommentRepository commentRepository;
+    @Mock CommentService commentService;
 
     @InjectMocks PostService postService;
 
@@ -231,20 +229,21 @@ class PostServiceTest {
         when(post.getUserId()).thenReturn("u1");
         when(post.getCreateTime()).thenReturn(LocalDateTime.of(2026, 1, 1, 0, 0));
 
-
         Attachment a1 = mock(Attachment.class);
         when(a1.getAttachmentId()).thenReturn(10L);
         when(a1.getOriginalFileName()).thenReturn("a.txt");
         when(a1.getS3Key()).thenReturn("k1");
         when(attachmentRepository.findAllByPost(post)).thenReturn(List.of(a1));
 
-
         Comment c1 = mock(Comment.class);
         when(c1.getCommentId()).thenReturn(100L);
         when(c1.getContent()).thenReturn("hello");
         when(c1.getUserId()).thenReturn("u2");
         when(c1.getCreateTime()).thenReturn(LocalDateTime.of(2026, 1, 1, 1, 0));
-        when(commentRepository.findAllByPostOrderByCreateTimeAsc(post)).thenReturn(List.of(c1));
+
+        // ✅ 여기만 이렇게 바꾸면 됨 (commentRepository를 스텁)
+        when(commentRepository.findByPost_PostIdOrderByCreateTimeAsc(eq(postId), any(Pageable.class)))
+                .thenReturn(List.of(c1));
 
         PostDetailResponse res = postService.getPostDetail(postId);
 
@@ -263,9 +262,9 @@ class PostServiceTest {
         assertEquals("hello", res.getComments().get(0).getContent());
         assertEquals("u2", res.getComments().get(0).getUserId());
 
-
+        // ✅ verify도 commentService 말고 commentRepository로
+        verify(commentRepository).findByPost_PostIdOrderByCreateTimeAsc(eq(postId), any(Pageable.class));
     }
-
     @Test
     void 게시글상세조회_포스트없음() {
         when(postRepository.findById(anyLong())).thenReturn(Optional.empty());
