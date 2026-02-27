@@ -1,15 +1,14 @@
 package com.studyCommunity.Community.repository;
 
 import com.studyCommunity.Community.dto.PostListResponse;
-import com.studyCommunity.Community.entity.Attachment;
 import com.studyCommunity.Community.entity.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
@@ -29,22 +28,28 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<PostListResponse> findPostList(Pageable pageable);
 
 
-//    @Query("""
-//            select new com.studyCommunity.Community.dto.PostListResponse(
-//                p.postId,
-//                p.title,
-//                p.userId,
-//                p.createTime,
-//                COUNT(distinct c.commentId),
-//                COUNT(distinct a.attachmentId)
-//            )
-//            from Post p
-//            left join Comment c on c.post = p
-//            left join Attachment a on a.post = p
-//            group by p
-//            order by count(distinct c.commentId) desc
-//            """)
-//    Page<PostListResponse> findPopularPostList(Pageable pageable);
+//    @Query(
+//            value = """
+//    select new com.studyCommunity.Community.dto.PostListResponse(
+//        p.postId,
+//        p.title,
+//        p.userId,
+//        p.createTime,
+//        count(distinct c.commentId),
+//        count(distinct a.attachmentId)
+//    )
+//    from Post p
+//    left join Comment c on c.post = p
+//    left join Attachment a on a.post = p
+//    group by p.postId, p.title, p.userId, p.createTime
+//    order by count(distinct c.commentId) desc, p.postId desc
+//  """,
+//            countQuery = """
+//    select count(p.postId)
+//    from Post p
+//  """
+//    )
+//    Page<PostListResponse> findPopularPostListHeavy(Pageable pageable);
 
 
     @Query("""
@@ -57,6 +62,31 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 """)
     Page<PostListResponse> findPopularPostList(Pageable pageable);
 
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update Post p set p.commentCount = p.commentCount + 1 where p.postId = :postId")
+    int incrementCommentCount(@Param("postId") Long postId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        update Post p
+           set p.commentCount = case when p.commentCount > 0 then p.commentCount - 1 else 0 end
+         where p.postId = :postId
+    """)
+    int decrementCommentCount(@Param("postId") Long postId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update Post p set p.attachmentCount = p.attachmentCount + :n where p.postId = :postId")
+    int increaseAttachmentCount(@Param("postId") Long postId, @Param("n") long n);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        update Post p
+           set p.attachmentCount =
+               case when p.attachmentCount >= :n then p.attachmentCount - :n else 0 end
+         where p.postId = :postId
+    """)
+    int decreaseAttachmentCount(@Param("postId") Long postId, @Param("n") long n);
 
 
 }
