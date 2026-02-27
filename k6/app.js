@@ -40,7 +40,7 @@ function pickPostId() {
 }
 
 export default function () {
-    const params = { headers: headers(), timeout: "120s" };
+    const params = { headers: headers(), timeout: "30s" };
 
     const r = Math.random();
 
