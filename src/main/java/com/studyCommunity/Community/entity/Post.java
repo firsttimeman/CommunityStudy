@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "post",
         indexes = {
-            @Index(name = "idx_post_commentcount_postid", columnList = "comment_count, post_id"), // todo postid
-                @Index(name = "idx_post_createtime_postid", columnList = "create_time, post_id") // createtime
+                @Index(name = "idx_post_createtime_postid", columnList = "create_time, post_id"),
+                @Index(name = "idx_post_commentcount_postid", columnList = "comment_count, post_id")
         }
 )
 public class Post extends BaseEntity {
@@ -45,21 +45,21 @@ public class Post extends BaseEntity {
         this.content = content;
     }
 
-    public void incrementCommentCount() {
-        this.commentCount++;
-    }
-
-    public void decrementCommentCount() {
-        if (this.commentCount > 0) this.commentCount--;
-    }
-
-    public void increaseAttachmentCount(long n) {
-        this.attachmentCount += n;
-    }
-
-    public void decreaseAttachmentCount(long n) {
-        this.attachmentCount = Math.max(0, this.attachmentCount - n);
-    }
+//    public void incrementCommentCount() {
+//        this.commentCount++;
+//    }
+//
+//    public void decrementCommentCount() {
+//        if (this.commentCount > 0) this.commentCount--;
+//    }
+//
+//    public void increaseAttachmentCount(long n) {
+//        this.attachmentCount += n;
+//    }
+//
+//    public void decreaseAttachmentCount(long n) {
+//        this.attachmentCount = Math.max(0, this.attachmentCount - n);
+//    }
 
 
 }

@@ -16,12 +16,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "attachment",
-        indexes = {
-            @Index(name = "idx_attachment_postid", columnList = "post_id"),
-                @Index(name = "idx_attachment_status_expireat", columnList = "attachment_status, expire_at")
-        }
-)
+@Table(name="attachment", indexes = {
+        @Index(name="idx_attachment_postid_id", columnList="post_id, attachment_id"),
+        @Index(name="idx_attachment_status_expireat", columnList="attachment_status, expire_at")
+})
 public class Attachment extends BaseEntity {
 
     @Id

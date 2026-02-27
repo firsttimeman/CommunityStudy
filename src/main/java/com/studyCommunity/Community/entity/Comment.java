@@ -12,11 +12,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "comments",
-        indexes = {
-            @Index(name = "idx_comment_postid", columnList = "post_id")
-        }
-)
+@Table(name="comments", indexes = {
+        @Index(name="idx_comment_postid_createtime_id", columnList="post_id, create_time, comment_id")
+})
 public class Comment extends BaseEntity {
 
     @Id
