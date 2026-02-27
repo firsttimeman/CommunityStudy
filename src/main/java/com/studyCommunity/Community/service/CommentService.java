@@ -10,6 +10,8 @@ import com.studyCommunity.Community.exception.NotFoundException;
 import com.studyCommunity.Community.repository.CommentRepository;
 import com.studyCommunity.Community.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +32,7 @@ public class CommentService {
         Comment comment = Comment.createComment(request.getContent(), userId, post);
         commentRepository.save(comment);
 
-        post.incrementCommentCount();
+        postRepository.incrementCommentCount(postId);
 
         return new CommentResponse(comment.getCommentId(),
                 comment.getContent(),
@@ -56,19 +58,22 @@ public class CommentService {
             throw new ForbiddenException("댓글 작성자만 삭제할 수 있습니다.");
         }
 
-        Post post = comment.getPost();
-        post.decrementCommentCount();
+        Long postId = comment.getPost().getPostId();
 
         commentRepository.delete(comment);
+        postRepository.decrementCommentCount(postId);
     }
 
 
     @Transactional
-    public List<CommentResponse> getComments(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NotFoundException("POST NOT FOUND"));
+    public List<CommentResponse>getComments(Long postId, int page, int size)  {
+        if (!postRepository.existsById(postId)) {
+            throw new NotFoundException("POST NOT FOUND");
+        }
 
-        return commentRepository.findAllByPostOrderByCreateTimeAsc(post)
+        var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createTime"));
+
+        return commentRepository.findByPost_PostIdOrderByCreateTimeAsc(postId, pageable)
                 .stream()
                 .map(c -> new CommentResponse(
                         c.getCommentId(),
