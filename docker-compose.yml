@@ -21,6 +21,20 @@ services:
     volumes:
       - grafana-data:/var/lib/grafana
 
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    command: [ "redis-server", "--appendonly", "yes" ]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
   mysql:
     image: mysql:8.0
     restart: always
@@ -62,6 +76,8 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     ports:
       - "8080:8080"
     env_file:
@@ -89,3 +105,4 @@ volumes:
   grafana-data:
   mysql-data:
   prometheus-data:
+  redis-data:
