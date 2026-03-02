@@ -3,6 +3,7 @@ package com.studyCommunity.Community.controller;
 import com.studyCommunity.Community.dto.CommentCreateRequest;
 import com.studyCommunity.Community.dto.CommentResponse;
 import com.studyCommunity.Community.dto.CommentUpdateRequest;
+import com.studyCommunity.Community.service.CommentFacade;
 import com.studyCommunity.Community.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +18,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
+    private final CommentFacade commentFacade;
 
     @PostMapping("/posts/{postId}")
     public ResponseEntity<BaseResponse<CommentResponse>> createComment(@RequestAttribute("userId") String userId,
                                                          @PathVariable Long postId,
-                                                         @Valid @RequestBody CommentCreateRequest request) {
-        CommentResponse comment = commentService.createComment(postId, request, userId);
+                                                         @Valid @RequestBody CommentCreateRequest request) throws InterruptedException {
+        CommentResponse comment = commentFacade.createCommentWithLock(postId, request, userId);
         return ResponseEntity.ok(BaseResponse.of(comment, HttpStatus.OK));
     }
 
