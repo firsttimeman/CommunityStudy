@@ -94,7 +94,6 @@ public class PostService {
     @Transactional
     public Page<PostListResponse> getPopularFeed(int page, int size) throws InterruptedException {
         Pageable pageable = PageRequest.of(page, size);
-//        Thread.sleep(10);
         return postRepository.findPopularPostList(pageable);
     }
 
