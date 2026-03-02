@@ -89,23 +89,13 @@ public class AttachmentService {
     public void attachToPost(List<Long> attachmentIds, Post post, String userId) {
         if (attachmentIds == null || attachmentIds.isEmpty()) return;
 
-        List<Attachment> attachments = attachmentRepository.findAllById(attachmentIds);
+        int updated = attachmentRepository.attachTempToPostAtomically(post, attachmentIds, userId);
 
-        if (attachments.size() != attachmentIds.size()) {
-            throw new NotFoundException("존재하지 않는 첨부파일 ID가 포함되어 있습니다.");
+
+        if (updated != attachmentIds.size()) {
+            throw new ForbiddenException("첨부파일이 이미 사용되었거나 권한이 없거나 유효하지 않은 ID가 포함되어 있습니다.");
         }
 
-        for (Attachment attachment : attachments) {
-            if (!userId.equals(attachment.getUserId())) {
-                throw new ForbiddenException("첨부파일 업로더가 아닙니다.");
-            }
-
-            if (attachment.getAttachmentStatus() != AttachmentStatus.TEMP) {
-                throw new ForbiddenException("이미 사용된 첨부파일입니다. attachmentId=" + attachment.getAttachmentId());
-            }
-
-            attachment.attachTo(post);
-        }
         postRepository.increaseAttachmentCount(post.getPostId(), attachmentIds.size());
     }
 
