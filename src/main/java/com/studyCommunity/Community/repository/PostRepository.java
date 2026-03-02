@@ -28,28 +28,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<PostListResponse> findPostList(Pageable pageable);
 
 
-//    @Query(
-//            value = """
-//    select new com.studyCommunity.Community.dto.PostListResponse(
-//        p.postId,
-//        p.title,
-//        p.userId,
-//        p.createTime,
-//        count(distinct c.commentId),
-//        count(distinct a.attachmentId)
-//    )
-//    from Post p
-//    left join Comment c on c.post = p
-//    left join Attachment a on a.post = p
-//    group by p.postId, p.title, p.userId, p.createTime
-//    order by count(distinct c.commentId) desc, p.postId desc
-//  """,
-//            countQuery = """
-//    select count(p.postId)
-//    from Post p
-//  """
-//    )
-//    Page<PostListResponse> findPopularPostListHeavy(Pageable pageable);
 
 
     @Query("""
