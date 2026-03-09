@@ -54,6 +54,8 @@ dependencies {
 	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
 	implementation 'org.redisson:redisson-spring-boot-starter:3.27.2'
+
+
 }
 
 tasks.named('test') {
